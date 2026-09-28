@@ -335,14 +335,19 @@
     text-align:center; color:var(--ink-soft); font-size:0.95rem;
     padding:50px 20px; background:var(--cream); border-radius:18px;
   }
+  /* Masonry via CSS columns — each photo keeps its own natural aspect ratio
+     (no forced crop/zoom), unlike a fixed-aspect-ratio grid. */
   .gallery-grid{
-    display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:18px;
+    column-count:1; column-gap:18px;
   }
+  @media (min-width:560px){ .gallery-grid{ column-count:2; } }
+  @media (min-width:860px){ .gallery-grid{ column-count:3; } }
+  @media (min-width:1180px){ .gallery-grid{ column-count:4; } }
   .g-item{
     border-radius:16px; overflow:hidden; box-shadow:var(--shadow-sm); position:relative;
-    aspect-ratio:4/3; background:var(--cream);
+    background:var(--cream); break-inside:avoid; margin-bottom:18px; cursor:zoom-in;
   }
-  .g-item img{width:100%; height:100%; object-fit:cover; display:block; transition:transform .35s ease;}
+  .g-item img{width:100%; height:auto; display:block; transition:transform .35s ease;}
   .g-item:hover img{transform:scale(1.06);}
   .g-caption{
     position:absolute; left:0; right:0; bottom:0; padding:10px 14px;
@@ -352,6 +357,32 @@
   .gallery-admin-note{
     margin-top:34px; text-align:center; font-size:0.8rem; color:var(--ink-soft);
     background:var(--cream); border-radius:14px; padding:16px 22px; max-width:560px; margin-left:auto; margin-right:auto;
+  }
+
+  /* ===== GALLERY LIGHTBOX ===== */
+  .g-lightbox{
+    position:fixed; inset:0; z-index:999; background:rgba(15,10,35,0.94);
+    display:none; align-items:center; justify-content:center; padding:40px 20px;
+  }
+  .g-lightbox.open{display:flex;}
+  .g-lightbox-img-wrap{
+    max-width:min(1100px, 92vw); max-height:88vh; display:flex; flex-direction:column; align-items:center; gap:14px;
+  }
+  .g-lightbox img{
+    max-width:100%; max-height:76vh; object-fit:contain; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  }
+  .g-lightbox-caption{color:var(--white); font-size:0.95rem; text-align:center; opacity:0.9;}
+  .g-lightbox-close, .g-lightbox-prev, .g-lightbox-next{
+    position:absolute; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.3);
+    color:var(--white); border-radius:50%; width:46px; height:46px; font-size:1.3rem; line-height:1;
+    display:flex; align-items:center; justify-content:center; cursor:pointer; transition:background .2s ease;
+  }
+  .g-lightbox-close:hover, .g-lightbox-prev:hover, .g-lightbox-next:hover{background:rgba(255,255,255,0.28);}
+  .g-lightbox-close{top:22px; right:22px;}
+  .g-lightbox-prev{left:22px; top:50%; transform:translateY(-50%);}
+  .g-lightbox-next{right:22px; top:50%; transform:translateY(-50%);}
+  @media (max-width:640px){
+    .g-lightbox-prev{left:8px;} .g-lightbox-next{right:8px;} .g-lightbox-close{top:10px; right:10px;}
   }
 
   /* ===== ADMISSIONS FORM ===== */
@@ -742,6 +773,16 @@
   </div>
 </section>
 
+<div class="g-lightbox" id="galleryLightbox">
+  <button type="button" class="g-lightbox-close" id="galleryLightboxClose" aria-label="Close">✕</button>
+  <button type="button" class="g-lightbox-prev" id="galleryLightboxPrev" aria-label="Previous photo">‹</button>
+  <button type="button" class="g-lightbox-next" id="galleryLightboxNext" aria-label="Next photo">›</button>
+  <div class="g-lightbox-img-wrap">
+    <img id="galleryLightboxImg" src="" alt="">
+    <div class="g-lightbox-caption" id="galleryLightboxCaption"></div>
+  </div>
+</div>
+
 <section class="leadership" id="leadership">
   <div class="container">
     <div class="section-head">
@@ -952,14 +993,16 @@
   const galleryEmpty = document.getElementById('galleryEmpty');
   const WEBSITE_GALLERY_KEY = "website-gallery";
   let mergedGalleryItems = galleryItems;
+  let currentGalleryView = []; // the items currently shown in the grid, for lightbox prev/next
 
   function renderGallery(cat){
     const items = mergedGalleryItems.filter(i => i.cat === cat);
-    galleryGrid.innerHTML = items.map(i =>
-      '<div class="g-item"><img src="' + i.src + '" alt="' + i.caption + '" loading="lazy">' +
+    currentGalleryView = items;
+    galleryGrid.innerHTML = items.map((i, idx) =>
+      '<div class="g-item" data-idx="' + idx + '"><img src="' + i.src + '" alt="' + i.caption + '" loading="lazy">' +
       '<div class="g-caption">' + i.caption + '</div></div>'
     ).join('');
-    galleryGrid.style.display = items.length ? 'grid' : 'none';
+    galleryGrid.style.display = items.length ? 'block' : 'none';
     galleryEmpty.style.display = items.length ? 'none' : 'block';
     galleryEmpty.textContent = items.length ? '' : 'No photos in this category yet.';
   }
@@ -978,6 +1021,52 @@
     mergedGalleryItems = fromErp.concat(galleryItems);
     const activeBtn = document.querySelector('.g-filter.active');
     if(activeBtn) renderGallery(activeBtn.dataset.cat);
+  });
+
+  /* =========================================================================
+     GALLERY LIGHTBOX — click any photo to view it full-size, uncropped, with
+     prev/next navigation. Works off currentGalleryView (whatever category is
+     currently rendered in the grid).
+  ========================================================================= */
+  const lightbox = document.getElementById('galleryLightbox');
+  const lightboxImg = document.getElementById('galleryLightboxImg');
+  const lightboxCaption = document.getElementById('galleryLightboxCaption');
+  let lightboxIndex = 0;
+
+  function openLightbox(idx){
+    if(!currentGalleryView.length) return;
+    lightboxIndex = idx;
+    showLightboxItem();
+    lightbox.classList.add('open');
+  }
+  function showLightboxItem(){
+    const item = currentGalleryView[lightboxIndex];
+    if(!item) return;
+    lightboxImg.src = item.src;
+    lightboxImg.alt = item.caption || '';
+    lightboxCaption.textContent = item.caption || '';
+  }
+  function closeLightbox(){ lightbox.classList.remove('open'); }
+  function lightboxStep(delta){
+    if(!currentGalleryView.length) return;
+    lightboxIndex = (lightboxIndex + delta + currentGalleryView.length) % currentGalleryView.length;
+    showLightboxItem();
+  }
+
+  galleryGrid.addEventListener('click', (e) => {
+    const item = e.target.closest('.g-item');
+    if(!item) return;
+    openLightbox(Number(item.dataset.idx));
+  });
+  document.getElementById('galleryLightboxClose').addEventListener('click', closeLightbox);
+  document.getElementById('galleryLightboxPrev').addEventListener('click', () => lightboxStep(-1));
+  document.getElementById('galleryLightboxNext').addEventListener('click', () => lightboxStep(1));
+  lightbox.addEventListener('click', (e) => { if(e.target === lightbox) closeLightbox(); });
+  document.addEventListener('keydown', (e) => {
+    if(!lightbox.classList.contains('open')) return;
+    if(e.key === 'Escape') closeLightbox();
+    if(e.key === 'ArrowLeft') lightboxStep(-1);
+    if(e.key === 'ArrowRight') lightboxStep(1);
   });
 </script>
 
