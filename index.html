@@ -693,6 +693,7 @@
   .xp.hot{background:linear-gradient(135deg,var(--magenta),var(--magenta-deep)); color:#fff; border-color:transparent;} .xp.hot i{background:rgba(255,255,255,.2);}
   .gps-feature{display:flex; flex-wrap:wrap; align-items:center; gap:18px; background:linear-gradient(135deg,#ecfdf3,#fff); border:1px solid rgba(22,163,74,.25); border-radius:24px; padding:22px 26px; margin-bottom:24px; box-shadow:var(--shadow-sm);}
   .gps-feature .big{font-size:2rem;} .gps-feature h3{font-size:1.2rem;} .gps-feature p{font-size:.9rem; color:var(--ink-soft); flex:1 1 240px;}
+  [hidden]{display:none !important;}
   .adm-bar{display:none; background:linear-gradient(90deg,var(--magenta-deep),var(--magenta),var(--gold)); color:#fff; text-align:center; font-size:.86rem; font-weight:600; padding:9px 16px; position:relative; z-index:101;} .adm-bar.on{display:block;} .adm-bar a{text-decoration:underline; margin-left:10px; white-space:nowrap;}
   .glance-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;}
 </style>
@@ -1826,6 +1827,13 @@
       $('aluGrid').innerHTML = d.alumni.map(function(a){ var n = String(a.name || '?').trim(); return '<div class="alu rv in"><div class="alu-av" aria-hidden="true">' + esc(n.charAt(0).toUpperCase()) + '</div>' + (a.batch ? '<div class="batch">Batch of ' + esc(a.batch) + '</div>' : '') + '<h3>' + esc(n) + '</h3>' + (a.now ? '<div class="now">' + esc(a.now) + '</div>' : '') + (a.quote ? '<q>“' + esc(a.quote) + '”</q>' : '') + '</div>'; }).join('');
       $('alumni').hidden = false; if($('navAlu')) $('navAlu').hidden = false;
     }
+    // --- per-section on/off switches from the ERP (Website Gallery > Website Content) ---
+    var vz = d.visible || {};
+    ['recognition','glance','safety','transport','achievements','alumni','explore','academics'].forEach(function(k){
+      if(vz[k] !== false) return;
+      var sec = $(k); if(sec) sec.hidden = true;
+      document.querySelectorAll('a[href="#' + k + '"]').forEach(function(a){ var li = a.closest('li'); if(li) li.hidden = true; if(a.classList.contains('xp')) a.hidden = true; });
+    });
     if(window.__refillMore) window.__refillMore();
 
     // --- admissions banner + office hours ---
