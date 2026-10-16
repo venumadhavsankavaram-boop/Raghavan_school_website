@@ -287,7 +287,7 @@
   .facilities .container{position:relative; z-index:1;}
   .facilities .section-head h2{color:var(--white);}
   .facilities .section-head p{color:rgba(255,255,255,0.7);}
-  .fac-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px,1fr)); gap:20px;}
+  .fac-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px;}
   .fac-card{
     background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
     border-radius:18px; padding:30px 22px; text-align:center;
@@ -603,7 +603,7 @@
 
   /* ===== 2026 REFRESH: stages, glance, safety, transport, achievements, alumni ===== */
   .sec-alt{background:linear-gradient(180deg,#fff 0%,var(--cream) 100%);}
-  .stages{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; align-items:stretch;}
+  .stages{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; align-items:start;}
   .stage{position:relative; background:var(--white); border-radius:28px; overflow:hidden; box-shadow:var(--shadow); display:flex; flex-direction:column; border:1px solid rgba(36,27,92,.07); transition:transform .4s var(--ease), box-shadow .4s var(--ease);}
   .stage:hover{transform:translateY(-8px); box-shadow:0 40px 70px -30px rgba(22,16,51,.38);}
   .stage-top{position:relative; padding:30px 28px 56px; color:#fff; overflow:hidden;}
@@ -696,6 +696,12 @@
   [hidden]{display:none !important;}
   .adm-bar{display:none; background:linear-gradient(90deg,var(--magenta-deep),var(--magenta),var(--gold)); color:#fff; text-align:center; font-size:.86rem; font-weight:600; padding:9px 16px; position:relative; z-index:101;} .adm-bar.on{display:block;} .adm-bar a{text-decoration:underline; margin-left:10px; white-space:nowrap;}
   .glance-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;}
+  .fac-card .gps-badge{margin-top:10px; background:rgba(22,163,74,.22); color:#9ff0c0;}
+  .fac-dl{margin-top:26px; display:flex; flex-wrap:wrap; gap:12px; justify-content:center;} .fac-dl a{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22); color:#fff; padding:10px 18px; border-radius:999px; font-size:.86rem; font-weight:600; transition:background .2s, transform .2s;} .fac-dl a:hover{background:var(--magenta); transform:translateY(-2px);}
+  .stage-btn{display:flex; align-items:center; justify-content:space-between; width:100%; font:inherit; font-weight:600; font-size:.92rem; color:var(--navy); background:var(--cream); border:1.5px solid rgba(36,27,92,.12); border-radius:14px; padding:12px 16px; cursor:pointer; transition:border-color .2s, background .2s;} .stage-btn:hover{border-color:var(--magenta); background:#fff;}
+  .stage-btn svg{transition:transform .3s var(--ease);} .stage.open .stage-btn svg{transform:rotate(180deg);}
+  .stage-more{display:grid; grid-template-rows:0fr; transition:grid-template-rows .4s var(--ease), opacity .3s; opacity:0;} .stage.open .stage-more{grid-template-rows:1fr; opacity:1;}
+  .stage-more > div{overflow:hidden; display:flex; flex-direction:column; gap:16px;}
 </style>
 </head>
 <body id="top">
@@ -715,9 +721,7 @@
         <li class="sec"><a href="#story">Our Story</a></li>
         <li><a href="#academics">Academics</a></li>
         <li class="sec"><a href="#pillars">Vision</a></li>
-        <li class="sec"><a href="#safety">Safety</a></li>
         <li class="sec"><a href="#facilities">Facilities</a></li>
-        <li class="sec"><a href="#transport">Transport</a></li>
         <li class="sec" id="navAch" hidden><a href="#achievements">Achievements</a></li>
         <li><a href="#gallery">Gallery</a></li>
         <li class="sec" id="navAlu" hidden><a href="#alumni">Alumni</a></li>
@@ -766,8 +770,6 @@
     </div>
     <div class="hero-stats">
       <div class="stat"><b data-count="1986" data-plain="1">1986</b><span>Established</span></div>
-      <div class="stat"><b data-count="12">12</b><span>Grade Levels</span></div>
-      <div class="stat"><b>A · B</b><span>Sections Each</span></div>
       <div class="stat"><b data-count="39">39</b><span>Years of Teaching</span></div>
     </div>
   </div>
@@ -887,14 +889,15 @@
     <div class="section-head">
       <span class="eyebrow">Academics</span>
       <h2>Three stages. One caring campus.</h2>
-      <p>From first steps in Pre-KG to the 10th Class board exam — English-medium learning on the State Board syllabus, with sections A and B in every class.</p>
+      <p>From first steps in Pre-KG to the 10th Class board exam — English-medium learning on the State Board syllabus.</p>
     </div>
     <div class="stages">
       <article class="stage pk rv" id="stagePk">
         <div class="stage-top"><div class="stage-ic" aria-hidden="true">🧸</div><h3>Pre-KG</h3><div class="range">Baby Class · LKG · UKG</div></div>
         <div class="stage-body">
           <div class="grade-chips"><span>Baby Class</span><span>LKG</span><span>UKG</span></div>
-          <h4>What children learn</h4>
+          <button type="button" class="stage-btn" aria-expanded="false"><span>See what is taught</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="stage-more"><div><h4>What children learn</h4>
           <ul class="learn" data-stage="preKg">
             <li>Phonics, letters and first English words through rhymes and stories</li>
             <li>Number sense — counting, shapes, colours and simple patterns</li>
@@ -903,14 +906,15 @@
             <li>Play, music and movement; good habits, sharing and manners</li>
           </ul>
           <div class="tags"><span>Play-based</span><span>Phonics</span><span>Art &amp; craft</span><span>Rhymes</span></div>
-          <div class="stage-foot"><b>Focus:</b> a happy, confident start and school-readiness.</div>
+          <div class="stage-foot"><b>Focus:</b> a happy, confident start and school-readiness.</div></div></div>
         </div>
       </article>
       <article class="stage pr rv" id="stagePr" style="--d:.1s">
         <div class="stage-top"><div class="stage-ic" aria-hidden="true">📚</div><h3>Primary School</h3><div class="range">1st – 5th Class</div></div>
         <div class="stage-body">
           <div class="grade-chips"><span>1st</span><span>2nd</span><span>3rd</span><span>4th</span><span>5th</span></div>
-          <h4>What children learn</h4>
+          <button type="button" class="stage-btn" aria-expanded="false"><span>See what is taught</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="stage-more"><div><h4>What children learn</h4>
           <ul class="learn" data-stage="primary">
             <li>Reading, writing and speaking — English, Telugu and Hindi</li>
             <li>Mathematics: tables, fractions, measurement and problem solving</li>
@@ -919,14 +923,15 @@
             <li>Drawing, games and activities; regular class tests and homework habits</li>
           </ul>
           <div class="tags"><span>English · Telugu · Hindi</span><span>Maths</span><span>EVS</span><span>Activities</span></div>
-          <div class="stage-foot"><b>Focus:</b> strong reading, writing and number fundamentals.</div>
+          <div class="stage-foot"><b>Focus:</b> strong reading, writing and number fundamentals.</div></div></div>
         </div>
       </article>
       <article class="stage hs rv" id="stageHs" style="--d:.2s">
         <div class="stage-top"><div class="stage-ic" aria-hidden="true">🎓</div><h3>High School</h3><div class="range">6th – 10th Class</div></div>
         <div class="stage-body">
           <div class="grade-chips"><span>6th</span><span>7th</span><span>8th</span><span>9th</span><span>10th</span></div>
-          <h4>What students learn</h4>
+          <button type="button" class="stage-btn" aria-expanded="false"><span>See what is taught</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <div class="stage-more"><div><h4>What students learn</h4>
           <ul class="learn" data-stage="high">
             <li>Languages — Telugu, Hindi and English, with writing and communication practice</li>
             <li>Mathematics — algebra, geometry, mensuration and statistics</li>
@@ -935,7 +940,7 @@
             <li>10th Class: revision, model papers and SSC board exam preparation</li>
           </ul>
           <div class="tags"><span>Maths</span><span>Science</span><span>Social</span><span>Board prep</span></div>
-          <div class="stage-foot"><b>Focus:</b> concept clarity, exam confidence and good character.</div>
+          <div class="stage-foot"><b>Focus:</b> concept clarity, exam confidence and good character.</div></div></div>
         </div>
       </article>
     </div>
@@ -959,37 +964,12 @@
   <div class="container">
     <div class="section-head">
       <span class="eyebrow">Recognition &amp; Affiliation</span>
-      <h2>A recognised, registered school</h2>
+      <h2 id="rcHeading">Recognised by Govt. of AP</h2>
     </div>
     <div class="recog-grid" id="recogGrid">
       <div class="rc rv"><small>Board</small><b id="rcBoard">State Board of Andhra Pradesh</b></div>
       <div class="rc rv" style="--d:.06s"><small>Medium</small><b id="rcMedium">English</b></div>
       <div class="rc rv" style="--d:.3s"><small>Established</small><b>1986</b></div>
-    </div>
-  </div>
-</section>
-
-<section class="explore" id="explore" aria-label="Quick links">
-  <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Explore</span>
-      <h2>Everything parents look for, one tap away</h2>
-    </div>
-    <div class="xp-grid" id="xpGrid">
-      <a class="xp hot rv" href="#admissions"><i aria-hidden="true">📝</i>Apply for Admission</a>
-      <a class="xp rv" href="https://erp.raghavanhighschool.com" target="_blank" rel="noopener"><i aria-hidden="true">🎓</i>Parent &amp; Student Portal</a>
-      <a class="xp rv" href="https://erp.raghavanhighschool.com" target="_blank" rel="noopener"><i aria-hidden="true">💳</i>Pay Fees Online</a>
-      <a class="xp rv" href="https://erp.raghavanhighschool.com" target="_blank" rel="noopener"><i aria-hidden="true">📊</i>Results &amp; Report Cards</a>
-      <a class="xp rv" href="#notices"><i aria-hidden="true">📣</i>Notices &amp; Events</a>
-      <a class="xp rv" href="#academics"><i aria-hidden="true">📚</i>Academics</a>
-      <a class="xp rv" href="#safety"><i aria-hidden="true">🛡️</i>Safety &amp; Women Safety</a>
-      <a class="xp rv" href="#transport"><i aria-hidden="true">🚌</i>Transport &amp; GPS</a>
-      <a class="xp rv" href="#facilities"><i aria-hidden="true">🏫</i>Campus &amp; Facilities</a>
-      <a class="xp rv" href="#gallery"><i aria-hidden="true">🖼️</i>Photo Gallery</a>
-      <a class="xp rv" href="#leadership"><i aria-hidden="true">👩‍🏫</i>Our Teachers</a>
-      <a class="xp rv" href="#faq"><i aria-hidden="true">❓</i>FAQs</a>
-      <a class="xp rv" href="#contact"><i aria-hidden="true">💼</i>Join Our Team</a>
-      <a class="xp rv" href="#contact"><i aria-hidden="true">📍</i>Find Us</a>
     </div>
   </div>
 </section>
@@ -1054,27 +1034,6 @@
   </div>
 </section>
 
-<section class="safety" id="safety">
-  <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">Safety &amp; Women Safety</span>
-      <h2>A safe, respectful campus for every child</h2>
-      <p>Parents should never have to worry. Here is how the school keeps children — girls especially — safe, from the gate to the classroom to the bus.</p>
-    </div>
-    <div class="safe-grid" id="safeGrid">
-      <div class="safe-card rv"><div class="safe-ic" aria-hidden="true">📹</div><h3>CCTV-monitored campus</h3><p>Classrooms, corridors and entry points are watched by cameras so that every child is looked after.</p></div>
-      <div class="safe-card rv" style="--d:.08s"><div class="safe-ic" aria-hidden="true">🚌</div><h3>Dedicated school transport</h3><p>Children travel in the school's own vehicles on fixed routes. See the Transport section for routes and GPS.</p></div>
-      <div class="safe-card rv" style="--d:.16s"><div class="safe-ic" aria-hidden="true">📲</div><h3>Parents stay informed</h3><p>Attendance, notices and fee updates reach parents through the Parent &amp; Student Portal.</p></div>
-      <div class="safe-card rv" style="--d:.24s"><div class="safe-ic" aria-hidden="true">🤝</div><h3>Speak up — we listen</h3><p>Any worry about a child's safety can be shared with the Principal or the school office directly. Every concern is taken seriously and handled in confidence.</p></div>
-    </div>
-    <div class="helplines rv"><b>Need help outside school hours? Free helplines (India)</b>
-      <a href="tel:181"><strong>181</strong>Women Helpline</a>
-      <a href="tel:1098"><strong>1098</strong>CHILDLINE</a>
-      <a href="tel:112"><strong>112</strong>Emergency</a>
-    </div>
-  </div>
-</section>
-
 <section class="facilities" id="facilities">
   <div class="container">
     <div class="section-head">
@@ -1083,10 +1042,11 @@
       <p>Practical facilities that support students and give parents peace of mind.</p>
     </div>
     <div class="fac-grid">
-      <div class="fac-card">
+      <div class="fac-card" id="facVehicle">
         <svg class="fac-icon" viewBox="0 0 48 48" fill="none"><rect x="4" y="16" width="34" height="18" rx="3" stroke="#CB9A2E" stroke-width="2.5"/><circle cx="14" cy="38" r="4" stroke="#CB9A2E" stroke-width="2.5"/><circle cx="32" cy="38" r="4" stroke="#CB9A2E" stroke-width="2.5"/><path d="M38 22H44L44 30H38" stroke="#CB9A2E" stroke-width="2.5" stroke-linecap="round"/></svg>
         <h4>Vehicle Facility</h4>
         <p>Dedicated school transport for students commuting from across B. Kotha Kota and surrounding areas.</p>
+        <span class="gps-badge" id="facGps" hidden><i></i>GPS ENABLED</span>
       </div>
       <div class="fac-card">
         <svg class="fac-icon" viewBox="0 0 48 48" fill="none"><path d="M24 4C24 4 12 20 12 30C12 37 17 42 24 42C31 42 36 37 36 30C36 20 24 4 24 4Z" stroke="#188F86" stroke-width="2.5"/></svg>
@@ -1098,6 +1058,11 @@
         <h4>CCTV Surveillance</h4>
         <p>Campus-wide camera monitoring to keep every classroom and corridor secure.</p>
       </div>
+            <div class="fac-card" id="facWomen">
+        <svg class="fac-icon" viewBox="0 0 48 48" fill="none"><path d="M24 4L8 10V22C8 32 15 40 24 44C33 40 40 32 40 22V10L24 4Z" stroke="#D11073" stroke-width="2.5" stroke-linejoin="round"/><path d="M17 24L22 29L31 19" stroke="#D11073" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h4>Women &amp; Child Safety</h4>
+        <p>A safe, respectful campus for every child. Any concern is heard by the Principal in confidence.</p>
+      </div>
       <div class="fac-card">
         <svg class="fac-icon" viewBox="0 0 48 48" fill="none"><rect x="5" y="8" width="38" height="26" rx="2" stroke="#CB9A2E" stroke-width="2.5"/><path d="M14 34L10 42M34 34L38 42" stroke="#CB9A2E" stroke-width="2.5" stroke-linecap="round"/><path d="M13 16H35M13 22H29" stroke="#CB9A2E" stroke-width="2.5" stroke-linecap="round"/></svg>
         <h4>Interactive Classrooms</h4>
@@ -1108,21 +1073,9 @@
         <h4>Sports &amp; Outdoor Activities</h4>
         <p>Open play areas and organized sports to keep students active beyond the classroom.</p>
       </div>
+      <span id="facExtraAnchor" hidden></span>
     </div>
-  </div>
-</section>
-
-<section class="transport sec-alt" id="transport">
-  <div class="container">
-    <div class="section-head">
-      <span class="eyebrow">School Transport</span>
-      <h2>Safe rides to school and back</h2>
-      <p>Dedicated school vehicles on fixed routes, driven by trained drivers.</p>
-    </div>
-    <div class="gps-feature rv" id="gpsFeature" hidden><span class="big" aria-hidden="true">📡</span><div><h3>GPS-enabled vehicles</h3></div><p id="gpsNote">Our school vehicles are fitted with GPS for added safety. Ask the school office about it.</p><a class="track-btn" href="#contact">Ask the office</a></div>
-    <div class="veh-grid" id="vehGrid">
-      <div class="veh-empty rv">🚌 <b>Dedicated school transport is available.</b><br>Please call the school office to know the route and timing for your area.</div>
-    </div>
+    <div class="fac-dl" id="facDl" hidden></div>
   </div>
 </section>
 
@@ -1742,6 +1695,7 @@
   var $ = function(id){ return document.getElementById(id); };
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  document.querySelectorAll('.stage-btn').forEach(function(b){ b.addEventListener('click', function(){ var st = b.closest('.stage'), o = !st.classList.contains('open'); st.classList.toggle('open', o); b.setAttribute('aria-expanded', o); b.querySelector('span').textContent = o ? 'Hide details' : 'See what is taught'; }); });
   // Home button on the mobile bar: scroll to top and close the menu
   var home = $('mbarHome');
   if(home) home.addEventListener('click', function(e){ e.preventDefault(); scrollTo({ top:0, behavior: reduce ? 'auto' : 'smooth' }); history.replaceState(null, '', location.pathname + location.search); });
@@ -1788,32 +1742,23 @@
       if(ul && lines.length) ul.innerHTML = lines.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join('');
     });
 
-    // --- safety ---
-    if(d.safety && d.safety.length && $('safeGrid')){
-      var ic = ['🛡️','👩‍🎓','📹','🚸','🤝','🔒'];
-      $('safeGrid').innerHTML = d.safety.map(function(x, i){ return '<div class="safe-card rv in"><div class="safe-ic" aria-hidden="true">' + ic[i % ic.length] + '</div><h3>' + esc(x.title) + '</h3><p>' + esc(x.detail) + '</p></div>'; }).join('');
-    }
-
-    // --- vehicles + GPS facility ---
+    // --- Facilities: GPS badge on the vehicle card, extra safety cards, downloads ---
     var tr = d.transport || {};
-    if(tr.gps && $('gpsFeature')){ $('gpsFeature').hidden = false; if(tr.note && $('gpsNote')) $('gpsNote').textContent = tr.note; }
-    if(d.vehicles && d.vehicles.length && $('vehGrid')){
-      $('vehGrid').innerHTML = d.vehicles.map(function(v){
-        return '<div class="veh rv in"><div class="veh-head"><div class="veh-ic" aria-hidden="true">🚌</div><h3>' + esc(v.label) + '</h3></div>' +
-          (v.route ? '<p><b>Route:</b> ' + esc(v.route) + '</p>' : '') + (v.timing ? '<p><b>Timing:</b> ' + esc(v.timing) + '</p>' : '') +
-          (tr.gps ? '<span class="gps-badge"><i></i>GPS ENABLED</span>' : '') + '</div>';
-      }).join('');
+    if(tr.gps && $('facGps')) $('facGps').hidden = false;
+    var grid = document.querySelector('.fac-grid');
+    if(d.safety && d.safety.length && grid){
+      if($('facWomen')) $('facWomen').hidden = true;
+      d.safety.forEach(function(x){ var c = document.createElement('div'); c.className = 'fac-card safety-extra'; c.innerHTML = '<svg class="fac-icon" viewBox="0 0 48 48" fill="none"><path d="M24 4L8 10V22C8 32 15 40 24 44C33 40 40 32 40 22V10L24 4Z" stroke="#D11073" stroke-width="2.5" stroke-linejoin="round"/></svg><h4>' + esc(x.title) + '</h4><p>' + esc(x.detail) + '</p>'; grid.appendChild(c); });
+    }
+    if(d.downloads && d.downloads.length && $('facDl')){
+      $('facDl').innerHTML = d.downloads.map(function(x){ return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">📥 ' + esc(x.title) + '</a>'; }).join(''); $('facDl').hidden = false;
     }
 
     // --- recognition / board ---
     var rg = d.recognition || {};
     if(rg.board && $('rcBoard')) $('rcBoard').textContent = rg.board;
     if(rg.medium && $('rcMedium')) $('rcMedium').textContent = rg.medium;
-
-    // --- downloads become buttons ---
-    if(d.downloads && d.downloads.length && $('xpGrid')){
-      $('xpGrid').insertAdjacentHTML('beforeend', d.downloads.map(function(x){ return '<a class="xp rv in" href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer"><i aria-hidden="true">📥</i>' + esc(x.title) + '</a>'; }).join(''));
-    }
+    if(rg.recognition && $('rcHeading')) $('rcHeading').textContent = rg.recognition;
 
     // --- achievements ---
     if(d.achievements && d.achievements.length && $('achGrid')){
@@ -1829,10 +1774,12 @@
     }
     // --- per-section on/off switches from the ERP (Website Gallery > Website Content) ---
     var vz = d.visible || {};
-    ['recognition','glance','safety','transport','achievements','alumni','explore','academics'].forEach(function(k){
+    var hideMap = { recognition:['recognition'], glance:['glance'], achievements:['achievements'], alumni:['alumni'], academics:['academics'], safety:['facWomen'], transport:['facVehicle'], explore:['facDl'] };
+    Object.keys(hideMap).forEach(function(k){
       if(vz[k] !== false) return;
-      var sec = $(k); if(sec) sec.hidden = true;
-      document.querySelectorAll('a[href="#' + k + '"]').forEach(function(a){ var li = a.closest('li'); if(li) li.hidden = true; if(a.classList.contains('xp')) a.hidden = true; });
+      hideMap[k].forEach(function(id){ var e = $(id); if(e) e.hidden = true; });
+      document.querySelectorAll('a[href="#' + k + '"]').forEach(function(a){ var li = a.closest('li'); if(li) li.hidden = true; });
+      if(k === 'safety') document.querySelectorAll('.safety-extra').forEach(function(e){ e.hidden = true; });
     });
     if(window.__refillMore) window.__refillMore();
 
@@ -1847,16 +1794,11 @@
     window.__extrasRecog = rg;
     paintRecog();
   }).catch(function(){ /* defaults stay */ });
-  var __info = {}, __rg = {};
   function paintRecog(){
-    __rg = window.__extrasRecog || __rg;
-    var grid = $('recogGrid'); if(!grid) return;
+    var rg = window.__extrasRecog || {}, grid = $('recogGrid'); if(!grid) return;
     grid.querySelectorAll('.rc.dyn').forEach(function(n){ n.remove(); });
-    var items = [['Recognition', __rg.recognition || __info.recognition], ['Registration / Affiliation No.', __rg.regNumber || __info.regNumber], ['Recognition order', __rg.recogNo], ['Valid till', __rg.validTill], ['UDISE Code', __rg.udise || __info.udise], ['School timings', __rg.timings]];
-    var est = grid.lastElementChild;
-    items.forEach(function(it, i){ if(!it[1]) return; var d = document.createElement('div'); d.className = 'rc rv in dyn'; d.innerHTML = '<small>' + esc(it[0]) + '</small><b>' + esc(it[1]) + '</b>'; grid.insertBefore(d, est); });
+    if(rg.timings){ var d = document.createElement('div'); d.className = 'rc rv in dyn'; d.innerHTML = '<small>School timings</small><b>' + esc(rg.timings) + '</b>'; grid.insertBefore(d, grid.lastElementChild); }
   }
-  fetch(base + '/api/school-info').then(function(r){ return r.ok ? r.json() : {}; }).then(function(i){ __info = i || {}; paintRecog(); }).catch(function(){});
 })();
 </script>
 <script>
