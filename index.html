@@ -693,11 +693,14 @@
   .xp.hot{background:linear-gradient(135deg,var(--magenta),var(--magenta-deep)); color:#fff; border-color:transparent;} .xp.hot i{background:rgba(255,255,255,.2);}
   .gps-feature{display:flex; flex-wrap:wrap; align-items:center; gap:18px; background:linear-gradient(135deg,#ecfdf3,#fff); border:1px solid rgba(22,163,74,.25); border-radius:24px; padding:22px 26px; margin-bottom:24px; box-shadow:var(--shadow-sm);}
   .gps-feature .big{font-size:2rem;} .gps-feature h3{font-size:1.2rem;} .gps-feature p{font-size:.9rem; color:var(--ink-soft); flex:1 1 240px;}
+  .adm-bar{display:none; background:linear-gradient(90deg,var(--magenta-deep),var(--magenta),var(--gold)); color:#fff; text-align:center; font-size:.86rem; font-weight:600; padding:9px 16px; position:relative; z-index:101;} .adm-bar.on{display:block;} .adm-bar a{text-decoration:underline; margin-left:10px; white-space:nowrap;}
+  .glance-grid{grid-template-columns:repeat(auto-fit,minmax(190px,1fr)) !important;}
 </style>
 </head>
 <body id="top">
 <div class="scroll-progress" id="scrollProgress"></div>
 
+<div class="adm-bar" id="admBar" role="status"><span id="admBarText"></span><a href="#admissions">Apply now →</a></div>
 <header>
   <div class="nav-inner">
     <div class="brand">
@@ -944,6 +947,7 @@
       <div class="g-tile rv"><i aria-hidden="true">🧑‍🎓</i><b id="gStudents">—</b><span>Students learning with us</span></div>
       <div class="g-tile rv" style="--d:.08s"><i aria-hidden="true">👩‍🏫</i><b id="gTeachers">—</b><span>Teachers</span></div>
       <div class="g-tile hi rv" style="--d:.16s"><i aria-hidden="true">⚖️</i><b id="gRatio">—</b><span>Teacher : student ratio</span></div>
+      <div class="g-tile rv" id="gResWrap" hidden style="--d:.2s"><i aria-hidden="true">📈</i><b id="gRes">—</b><span id="gResLbl">Latest results</span></div>
       <div class="g-tile rv" style="--d:.24s"><i aria-hidden="true">🏫</i><b id="gYears">—</b><span>Years of service since 1986</span></div>
     </div>
     <p class="glance-note" id="gNote"></p>
@@ -959,9 +963,6 @@
     <div class="recog-grid" id="recogGrid">
       <div class="rc rv"><small>Board</small><b id="rcBoard">State Board of Andhra Pradesh</b></div>
       <div class="rc rv" style="--d:.06s"><small>Medium</small><b id="rcMedium">English</b></div>
-      <div class="rc rv" style="--d:.12s" id="rcRecogWrap" hidden><small>Recognition</small><b id="rcRecog"></b></div>
-      <div class="rc rv" style="--d:.18s" id="rcRegWrap" hidden><small>Registration / Affiliation No.</small><b id="rcReg"></b></div>
-      <div class="rc rv" style="--d:.24s" id="rcUdiseWrap" hidden><small>UDISE Code</small><b id="rcUdise"></b></div>
       <div class="rc rv" style="--d:.3s"><small>Established</small><b>1986</b></div>
     </div>
   </div>
@@ -1827,21 +1828,27 @@
     }
     if(window.__refillMore) window.__refillMore();
 
-    // --- admissions copy ---
+    // --- admissions banner + office hours ---
     var ad = d.admission || {};
-    if(ad.heading && $('admHeading')) $('admHeading').textContent = ad.heading;
-    if(ad.intro && $('admIntro')) $('admIntro').textContent = ad.intro;
-    if(ad.documents && $('admDocs')){
-      var docs = String(ad.documents).split(/\n+/).map(function(t){ return t.trim(); }).filter(Boolean);
-      if(docs.length){ $('admDocs').innerHTML = '<li style="padding-left:0;font-weight:700;list-style:none;"><span style="display:none"></span>Documents to bring</li>' + docs.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join(''); $('admDocs').classList.add('on'); var first = $('admDocs').firstChild; first.style.setProperty('--x','1'); }
-    }
-    var meta = [ad.hours ? 'Office hours: ' + ad.hours : '', ad.lastDate || ''].filter(Boolean).join(' · ');
-    if($('admMeta')) $('admMeta').textContent = meta;
+    if(ad.open && $('admBar')){ $('admBarText').textContent = [ad.heading || 'Admissions are open', ad.lastDate].filter(Boolean).join(' · '); $('admBar').classList.add('on'); }
+    if($('admMeta') && ad.hours) $('admMeta').textContent = 'Office hours: ' + ad.hours;
+
+    // --- results snapshot ---
+    var rs = d.results || {};
+    if(rs.pass && $('gResWrap')){ $('gRes').textContent = rs.pass; $('gResLbl').textContent = rs.label || 'Latest results'; $('gResWrap').hidden = false; }
+    window.__extrasRecog = rg;
+    paintRecog();
   }).catch(function(){ /* defaults stay */ });
-  fetch(base + '/api/school-info').then(function(r){ return r.ok ? r.json() : {}; }).then(function(i){
-    function put(w, t, v){ if(v && $(w) && $(t)){ $(t).textContent = v; $(w).hidden = false; } }
-    put('rcRecogWrap','rcRecog', i.recognition); put('rcRegWrap','rcReg', i.regNumber); put('rcUdiseWrap','rcUdise', i.udise);
-  }).catch(function(){});
+  var __info = {}, __rg = {};
+  function paintRecog(){
+    __rg = window.__extrasRecog || __rg;
+    var grid = $('recogGrid'); if(!grid) return;
+    grid.querySelectorAll('.rc.dyn').forEach(function(n){ n.remove(); });
+    var items = [['Recognition', __rg.recognition || __info.recognition], ['Registration / Affiliation No.', __rg.regNumber || __info.regNumber], ['Recognition order', __rg.recogNo], ['Valid till', __rg.validTill], ['UDISE Code', __rg.udise || __info.udise], ['School timings', __rg.timings]];
+    var est = grid.lastElementChild;
+    items.forEach(function(it, i){ if(!it[1]) return; var d = document.createElement('div'); d.className = 'rc rv in dyn'; d.innerHTML = '<small>' + esc(it[0]) + '</small><b>' + esc(it[1]) + '</b>'; grid.insertBefore(d, est); });
+  }
+  fetch(base + '/api/school-info').then(function(r){ return r.ok ? r.json() : {}; }).then(function(i){ __info = i || {}; paintRecog(); }).catch(function(){});
 })();
 </script>
 <script>
