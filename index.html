@@ -1320,10 +1320,22 @@
           <li><a href="mailto:raghavanhighschool@gmail.com" id="footEmail">raghavanhighschool@gmail.com</a></li>
         </ul>
       </div>
+      <div id="footPolicyCol" hidden>
+        <h5>Policies</h5>
+        <ul id="footPolicies"></ul>
+      </div>
     </div>
     <div class="foot-bottom"><span>© <span id="footYear">2026</span> Raghavan English Medium High School. All rights reserved.</span><span>Spread the Light of Knowledge</span></div>
   </div>
 </footer>
+<div class="pol-view" id="polView" role="dialog" aria-modal="true" aria-labelledby="polTitle" hidden>
+  <div class="pol-card">
+    <button type="button" class="pol-close" id="polClose" aria-label="Close">&times;</button>
+    <h2 id="polTitle"></h2>
+    <p class="pol-date" id="polDate"></p>
+    <div class="pol-body" id="polBody"></div>
+  </div>
+</div>
 <nav class="mbar" aria-label="Quick actions">
   <a href="#top" class="home" id="mbarHome"><b aria-hidden="true">🏠</b>Home</a>
   <a href="tel:+918582295255" id="mbarCall"><b aria-hidden="true">📞</b>Call</a>
@@ -1772,6 +1784,8 @@
       $('aluGrid').innerHTML = d.alumni.map(function(a){ var n = String(a.name || '?').trim(); return '<div class="alu rv in"><div class="alu-av" aria-hidden="true">' + esc(n.charAt(0).toUpperCase()) + '</div>' + (a.batch ? '<div class="batch">Batch of ' + esc(a.batch) + '</div>' : '') + '<h3>' + esc(n) + '</h3>' + (a.now ? '<div class="now">' + esc(a.now) + '</div>' : '') + (a.quote ? '<q>“' + esc(a.quote) + '”</q>' : '') + '</div>'; }).join('');
       $('alumni').hidden = false; if($('navAlu')) $('navAlu').hidden = false;
     }
+    window.__pendingPolicies = d.policies || {};
+    if(window.__setPolicies) window.__setPolicies(window.__pendingPolicies);
     // --- per-section on/off switches from the ERP (Website Gallery > Website Content) ---
     var vz = d.visible || {};
     var hideMap = { recognition:['recognition'], glance:['glance'], achievements:['achievements'], alumni:['alumni'], academics:['academics'], safety:['facWomen'], transport:['facVehicle'], explore:['facDl'] };
@@ -1862,6 +1876,92 @@
   var logo = document.querySelector('.brand img'), ic = document.createElement('link');
   if(logo && logo.src){ ic.rel = 'icon'; ic.href = logo.src; document.head.appendChild(ic); }
   var y = document.getElementById('footYear'); if(y) y.textContent = new Date().getFullYear();
+})();
+</script>
+<style id="polCss">
+  @media (min-width:1001px){ .foot-grid.has-pol{ grid-template-columns:1.4fr 1fr 1.2fr 1fr; } }
+  .pol-view{position:fixed; inset:0; z-index:9999; background:rgba(22,16,51,.72); overflow-y:auto; padding:28px 14px; -webkit-overflow-scrolling:touch;}
+  .pol-view[hidden]{display:none;}
+  .pol-card{position:relative; max-width:760px; margin:0 auto; background:var(--cream,#FFFBF3); color:var(--ink,#1A1530); border-radius:20px; padding:34px 30px 38px; box-shadow:0 30px 70px -20px rgba(0,0,0,.45);}
+  .pol-card h2{font-size:1.7rem; margin:0 36px 4px 0; color:var(--navy,#211A4E); line-height:1.2;}
+  .pol-date{font-size:.8rem; color:var(--ink-soft,#544C6B); margin-bottom:18px;}
+  .pol-body h3{font-size:1.05rem; margin:22px 0 6px; color:var(--navy,#211A4E);}
+  .pol-body p{margin:0 0 12px; line-height:1.65; font-size:.97rem;}
+  .pol-body ul{margin:0 0 12px; padding-left:20px; display:block; list-style:disc;}
+  .pol-body li{margin:0 0 6px; line-height:1.6; font-size:.97rem;}
+  .pol-close{position:absolute; top:12px; right:14px; width:38px; height:38px; border-radius:50%; border:0; background:rgba(33,26,78,.08); color:var(--navy,#211A4E); font-size:1.6rem; line-height:1; cursor:pointer;}
+  .pol-close:hover,.pol-close:focus-visible{background:rgba(33,26,78,.18);}
+  @media (max-width:600px){ .pol-card{padding:26px 18px 30px; border-radius:16px;} .pol-card h2{font-size:1.4rem;} }
+  @media print{ body > *:not(.pol-view){display:none !important;} .pol-view{position:static; background:none; padding:0;} .pol-card{box-shadow:none; max-width:none;} .pol-close{display:none;} }
+</style>
+<script>
+/* Policy pages: the school writes them in the ERP (Website Gallery > Website Content > Policy pages) and ticks "Show on website".
+   Nothing shows until then. Text is drawn as plain text (never HTML). Link: #policy-privacy, #policy-terms, #policy-refund, #policy-admission. */
+(function(){
+  var ORDER = ['privacy','terms','refund','admission'];
+  var NAMES = { privacy:'Privacy Policy', terms:'Terms of Use', refund:'Fee & Refund Policy', admission:'Admission Policy' };
+  var $ = function(id){ return document.getElementById(id); };
+  var data = {}, lastFocus = null;
+  function esc(v){ return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function val(id, dflt){ var e = $(id), s = e ? (e.textContent || '').trim() : ''; return (s && s !== '\u2014') ? s : dflt; }
+  function fill(text){
+    var map = { school: (function(){ var e = $('footName') || document.querySelector('.foot-name'); var x = e ? (e.textContent || '').trim() : ''; return x || 'the school'; })(), address: val('footAddr', 'the school address'), phone: val('footPhone', 'the school office'), email: val('footEmail', 'the school office') };
+    return String(text || '').replace(/\{\{\s*(school|address|phone|email)\s*\}\}/gi, function(m, k){ return map[k.toLowerCase()]; });
+  }
+  function render(text){
+    var out = [], list = [], para = [];
+    function flushList(){ if(list.length){ out.push('<ul>' + list.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'); list = []; } }
+    function flushPara(){ if(para.length){ out.push('<p>' + para.map(esc).join('<br>') + '</p>'); para = []; } }
+    fill(text).split(/\r?\n/).forEach(function(line){
+      var l = line.replace(/\s+$/, '');
+      if(!l.trim()){ flushList(); flushPara(); }
+      else if(/^##\s+/.test(l)){ flushList(); flushPara(); out.push('<h3>' + esc(l.replace(/^##\s+/, '')) + '</h3>'); }
+      else if(/^[-*]\s+/.test(l)){ flushPara(); list.push(l.replace(/^[-*]\s+/, '')); }
+      else { flushList(); para.push(l.trim()); }
+    });
+    flushList(); flushPara();
+    return out.join('');
+  }
+  function dmy(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ''); return m ? m[3] + '/' + m[2] + '/' + m[1] : ''; }
+  function close(fromHash){
+    var v = $('polView'); if(!v || v.hidden) return;
+    v.hidden = true; document.documentElement.style.overflow = '';
+    if(!fromHash && /^#policy-/.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+    if(lastFocus && lastFocus.focus){ try{ lastFocus.focus(); }catch(e){} }
+  }
+  function open(k){
+    var p = data[k], v = $('polView'); if(!p || !v) return;
+    $('polTitle').textContent = p.title || NAMES[k] || 'Policy';
+    $('polDate').textContent = p.updated ? 'Last updated: ' + dmy(p.updated) : '';
+    $('polBody').innerHTML = render(p.body);
+    lastFocus = document.activeElement; v.hidden = false; v.scrollTop = 0;
+    document.documentElement.style.overflow = 'hidden';
+    var c = $('polClose'); if(c) c.focus();
+  }
+  function route(){
+    var m = /^#policy-([a-z]+)$/.exec(location.hash || '');
+    if(m && data[m[1]]) open(m[1]); else close(true);
+  }
+  window.__setPolicies = function(d){
+    data = {}; var ul = $('footPolicies'), col = $('footPolicyCol');
+    ORDER.forEach(function(k){ if(d && d[k] && d[k].body) data[k] = d[k]; });
+    var keys = ORDER.filter(function(k){ return data[k]; });
+    if(ul) ul.innerHTML = keys.map(function(k){ return '<li><a href="#policy-' + k + '">' + esc(data[k].title || NAMES[k]) + '</a></li>'; }).join('');
+    if(col) col.hidden = !keys.length;
+    var g = col && col.parentNode; if(g) g.classList.toggle('has-pol', !!keys.length);
+    route();
+  };
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a[href^="#policy-"]');
+    if(a){ var k = a.getAttribute('href').slice(8); if(data[k]){ e.preventDefault(); history.pushState(null, '', '#policy-' + k); open(k); } }
+  });
+  window.addEventListener('hashchange', route);
+  window.addEventListener('popstate', route);
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(false); });
+  if(window.__pendingPolicies) window.__setPolicies(window.__pendingPolicies); // the answer from the ERP can arrive before this script has run
+  var v = $('polView'), c = $('polClose');
+  if(c) c.addEventListener('click', function(){ close(false); });
+  if(v) v.addEventListener('click', function(e){ if(e.target === v) close(false); });
 })();
 </script>
 </body>
