@@ -2,4 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=$HOME/public_html/
-    - /bin/cp -f index.html robots.txt sitemap.xml logo.png og-image.jpg favicon.png apple-touch-icon.png icon-192.png $DEPLOYPATH
+    - /bin/cp -f index.html robots.txt sitemap.xml logo.png og-image.jpg favicon.png apple-touch-icon.png icon-192.png google9a1678003dd36509.html $DEPLOYPATH
