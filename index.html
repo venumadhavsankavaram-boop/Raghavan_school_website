@@ -1091,6 +1091,11 @@
         <h4>Sports &amp; Outdoor Activities</h4>
         <p>Open play areas and organized sports to keep students active beyond the classroom.</p>
       </div>
+      <div class="fac-card" id="facScouts">
+        <svg class="fac-icon" viewBox="0 0 48 48" fill="none"><path d="M24 5L5 38H43L24 5Z" stroke="#188F86" stroke-width="2.5" stroke-linejoin="round"/><path d="M24 38V26L18 38M24 26L30 38" stroke="#188F86" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M24 5V14" stroke="#188F86" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <h4>Scouts &amp; Guides</h4>
+        <p id="facScoutsText">Our Scouts and Guides units build discipline, teamwork, service to others and leadership through drills, camps and community activities.</p>
+      </div>
       <span id="facExtraAnchor" hidden></span>
     </div>
     <div class="fac-dl" id="facDl" hidden></div>
@@ -1781,6 +1786,11 @@
       if($('facWomen')) $('facWomen').hidden = true;
       d.safety.forEach(function(x){ var c = document.createElement('div'); c.className = 'fac-card safety-extra'; c.innerHTML = '<svg class="fac-icon" viewBox="0 0 48 48" fill="none"><path d="M24 4L8 10V22C8 32 15 40 24 44C33 40 40 32 40 22V10L24 4Z" stroke="#D11073" stroke-width="2.5" stroke-linejoin="round"/></svg><h4>' + esc(x.title) + '</h4><p>' + esc(x.detail) + '</p>'; grid.appendChild(c); });
     }
+    var sc = d.scouts || {};
+    if($('facScoutsText')){
+      if(sc.detail && String(sc.detail).trim()) $('facScoutsText').textContent = String(sc.detail).trim();
+      if(sc.classes && String(sc.classes).trim()) $('facScoutsText').textContent += ' Classes: ' + String(sc.classes).trim() + '.';
+    }
     if(d.downloads && d.downloads.length && $('facDl')){
       $('facDl').innerHTML = d.downloads.map(function(x){ return '<a href="' + esc(x.url) + '" target="_blank" rel="noopener noreferrer">📥 ' + esc(x.title) + '</a>'; }).join(''); $('facDl').hidden = false;
     }
@@ -1807,7 +1817,7 @@
     if(window.__setPolicies) window.__setPolicies(window.__pendingPolicies);
     // --- per-section on/off switches from the ERP (Website Gallery > Website Content) ---
     var vz = d.visible || {};
-    var hideMap = { recognition:['recognition'], glance:['glance'], achievements:['achievements'], alumni:['alumni'], academics:['academics'], safety:['facWomen'], transport:['facVehicle'], explore:['facDl'] };
+    var hideMap = { recognition:['recognition'], glance:['glance'], achievements:['achievements'], alumni:['alumni'], academics:['academics'], safety:['facWomen'], transport:['facVehicle'], explore:['facDl'], scouts:['facScouts'] };
     Object.keys(hideMap).forEach(function(k){
       if(vz[k] !== false) return;
       hideMap[k].forEach(function(id){ var e = $(id); if(e) e.hidden = true; });
