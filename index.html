@@ -681,6 +681,11 @@
   .ach .yr{display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.1em; color:#fff; background:linear-gradient(135deg,var(--gold),#b3801a); padding:5px 12px; border-radius:999px; margin-bottom:12px;}
   .ach .cat{position:absolute; right:18px; top:20px; font-size:1.7rem;}
   .ach h3{font-size:1.15rem; margin-bottom:6px;} .ach p{font-size:.9rem; color:var(--ink-soft); line-height:1.6;}
+  .alu-share{max-width:520px;margin:28px auto 0;text-align:center}
+  .alu-share form{text-align:left;margin-top:16px;display:grid;gap:12px;position:relative}
+  .alu-share label{display:grid;gap:4px;font-weight:600;font-size:.9rem}
+  .alu-share input,.alu-share textarea{font:inherit;padding:10px 12px;border:1px solid #c9c9d3;border-radius:10px;width:100%;box-sizing:border-box}
+  .alu-msg{margin:0;font-size:.92rem}
   .alu-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:22px;}
   .alu{background:var(--white); border-radius:26px; padding:26px 24px; box-shadow:var(--shadow-sm); border:1px solid rgba(36,27,92,.07); text-align:center; transition:transform .35s var(--ease), box-shadow .35s;}
   .alu:hover{transform:translateY(-6px); box-shadow:var(--shadow);}
@@ -1146,9 +1151,22 @@
     <div class="section-head">
       <span class="eyebrow">Alumni</span>
       <h2>Once Raghavan, always Raghavan</h2>
-      <p>Our former students are doing us proud across the country. Are you one of them? Call the office and we will add your story.</p>
+      <p>Our former students are doing us proud across the country. Are you one of them? Share your story below. It appears here after the school approves it.</p>
     </div>
     <div class="alu-grid" id="aluGrid"></div>
+    <div class="alu-share" id="aluShare">
+      <button type="button" class="btn btn-primary" id="aluOpen" aria-expanded="false" aria-controls="aluForm">Share your story</button>
+      <form id="aluForm" hidden novalidate>
+        <label>Your name<input name="name" maxlength="80" required autocomplete="name"></label>
+        <label>Batch (year you passed 10th)<input name="batch" maxlength="20" required placeholder="e.g. 2012"></label>
+        <label>What you do now<input name="now" maxlength="120" placeholder="e.g. Software engineer, Hyderabad"></label>
+        <label>A message for our students (optional)<textarea name="quote" rows="3" maxlength="400"></textarea></label>
+        <label>Your phone or email<input name="contact" maxlength="80" required autocomplete="tel" placeholder="Only the school sees this. It is never shown on the website."></label>
+        <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;">
+        <button type="submit" class="btn btn-primary">Send to the school</button>
+        <p class="alu-msg" id="aluMsg" role="status"></p>
+      </form>
+    </div>
   </div>
 </section>
 
@@ -1809,6 +1827,7 @@
     }
 
     // --- alumni ---
+    if($('alumni')){ $('alumni').hidden = false; if($('navAlu')) $('navAlu').hidden = false; }
     if(d.alumni && d.alumni.length && $('aluGrid')){
       $('aluGrid').innerHTML = d.alumni.map(function(a){ var n = String(a.name || '?').trim(); return '<div class="alu rv in"><div class="alu-av" aria-hidden="true">' + esc(n.charAt(0).toUpperCase()) + '</div>' + (a.batch ? '<div class="batch">Batch of ' + esc(a.batch) + '</div>' : '') + '<h3>' + esc(n) + '</h3>' + (a.now ? '<div class="now">' + esc(a.now) + '</div>' : '') + (a.quote ? '<q>“' + esc(a.quote) + '”</q>' : '') + '</div>'; }).join('');
       $('alumni').hidden = false; if($('navAlu')) $('navAlu').hidden = false;
@@ -1998,6 +2017,26 @@
 (function(){var el=document.getElementById('visitLine');if(!el)return;var K='visitDay',d=new Date(Date.now()+19800000).toISOString().slice(0,10),t='';try{t=localStorage.getItem(K)||''}catch(e){}
 var post=t!==d;fetch('https://erp.raghavanhighschool.com'+(post?'/api/site-visit':'/api/site-visits'),{method:post?'POST':'GET'}).then(function(r){return r.json()}).then(function(j){if(post){try{localStorage.setItem(K,d)}catch(e){}}
 if(j&&j.show){el.textContent='\uD83D\uDC65 '+Number(j.total).toLocaleString('en-IN')+' visitors';el.hidden=false}}).catch(function(){})})();
+
+(function(){
+  var open = document.getElementById('aluOpen'), f = document.getElementById('aluForm'), m = document.getElementById('aluMsg');
+  if(!open || !f) return;
+  open.addEventListener('click', function(){ f.hidden = !f.hidden; open.setAttribute('aria-expanded', String(!f.hidden)); });
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    var v = function(n){ return (f.elements[n].value || '').trim(); };
+    if(!v('name') || !v('batch') || !v('contact')){ m.textContent = 'Please fill your name, batch and phone or email.'; return; }
+    var btn = f.querySelector('button[type=submit]'); btn.disabled = true; m.textContent = 'Sending…';
+    var base = (typeof ERP_API_BASE !== 'undefined') ? ERP_API_BASE : 'https://erp.raghavanhighschool.com';
+    fetch(base + '/api/alumni-submit', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ name:v('name'), batch:v('batch'), now:v('now'), quote:v('quote'), contact:v('contact'), website:v('website') }) })
+      .then(function(r){ return r.json().catch(function(){ return {}; }).then(function(j){ return { ok:r.ok, j:j }; }); })
+      .then(function(x){
+        if(x.ok){ f.reset(); f.hidden = true; open.hidden = true; document.getElementById('aluShare').insertAdjacentHTML('beforeend', '<p class="alu-msg"><b>Thank you!</b> The school will check your details and your story will appear here once approved.</p>'); }
+        else { m.textContent = (x.j && x.j.error) || 'Could not send. Please call the school office.'; btn.disabled = false; }
+      })
+      .catch(function(){ m.textContent = 'Could not send. Please check your internet or call the school office.'; btn.disabled = false; });
+  });
+})();
 </script>
 </body>
 </html>
