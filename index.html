@@ -23,6 +23,7 @@
 <meta name="twitter:image" content="https://raghavanhighschool.com/og-image.jpg">
 <link rel="icon" type="image/png" sizes="48x48" href="/favicon.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="canonical" href="https://raghavanhighschool.com/">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["School","EducationalOrganization"],"@id":"https://raghavanhighschool.com/#school","name":"Raghavan English Medium High School","alternateName":["Raghavan EM High School","Raghavan High School B. Kotha Kota"],"url":"https://raghavanhighschool.com/","logo":"https://raghavanhighschool.com/logo.png","image":"https://raghavanhighschool.com/og-image.jpg","slogan":"Spread the Light of Knowledge","description":"English-medium school from Baby Class to 10th Class in B. Kotha Kota, Annamayya District, Andhra Pradesh, following the State Board of Andhra Pradesh. Established 1986.","foundingDate":"1986","sameAs":["https://www.facebook.com/profile.php?id=100063618172008","https://www.instagram.com/raghavanhighschool/"],"email":"raghavanhighschool@gmail.com","telephone":"+91-8582-295255","areaServed":"B. Kotha Kota and surrounding areas, Annamayya District, Andhra Pradesh","address":{"@type":"PostalAddress","streetAddress":"D-11-496 A-4564, RSM Road","addressLocality":"B. Kotha Kota","addressRegion":"Andhra Pradesh","postalCode":"517370","addressCountry":"IN"},"contactPoint":{"@type":"ContactPoint","contactType":"admissions","telephone":"+91-8582-295255","email":"raghavanhighschool@gmail.com","areaServed":"IN","availableLanguage":["English","Telugu"]}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","@id":"https://raghavanhighschool.com/#website","url":"https://raghavanhighschool.com/","name":"Raghavan English Medium High School","inLanguage":"en-IN","publisher":{"@id":"https://raghavanhighschool.com/#school"}}</script>
@@ -1544,7 +1545,7 @@
     if(!grid) return;
     grid.innerHTML = leaders.map(l => `
       <div class="lead-card">
-        <div class="lead-avatar">${l.photo ? `<img src="${l.photo}" alt="${l.name || ''}">` : leadershipInitialsAvatar(l.name || '')}</div>
+        <div class="lead-avatar">${l.photo ? `<img src="${l.photo}" alt="${l.name || ''}" loading="lazy" decoding="async">` : leadershipInitialsAvatar(l.name || '')}</div>
         <h3>${l.name || ''}</h3>
         ${l.title ? `<div class="lead-role">${l.title}</div>` : ''}
         ${l.qualification ? `<div class="lead-qual">${l.qualification}</div>` : ''}
